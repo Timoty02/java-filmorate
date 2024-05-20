@@ -14,31 +14,32 @@ import java.util.List;
 @Slf4j
 public class FilmController {
     List<Film> films = new ArrayList<>();
+
     @PostMapping
-    public Film addFilm(@RequestBody Film film){
-        if (validateFilm(film)){
+    public Film addFilm(@RequestBody Film film) {
+        if (validateFilm(film)) {
             films.add(film);
             log.info("Added new film - " + film);
             return film;
-        } else{
+        } else {
             log.warn("Unable to add film - " + film + " due to validation error");
             throw new ValidationException("Wrong film info");
         }
     }
 
     @GetMapping
-    public List<Film> getFilms(){
+    public List<Film> getFilms() {
         log.info("List of films sent");
         return films;
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film){
+    public Film updateFilm(@RequestBody Film film) {
         log.info("film " + film + " updated");
         return film;
     }
 
-    protected boolean validateFilm(Film film){
+    protected boolean validateFilm(Film film) {
         return !film.getName().isBlank() &&
                 film.getDescription().length() <= 200 &&
                 film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 27)) &&

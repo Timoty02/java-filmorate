@@ -13,31 +13,32 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     List<User> users = new ArrayList<>();
+
     @PostMapping
-    public User addFilm(@RequestBody User user){
-        if (validateUser(user)){
+    public User addFilm(@RequestBody User user) {
+        if (validateUser(user)) {
             users.add(user);
             log.info("Added new user - " + user);
             return user;
-        } else{
+        } else {
             log.warn("Unable to add user - " + user + " due to validation error");
             throw new ValidationException("Wrong user info");
         }
     }
 
     @GetMapping
-    public List<User> getUsers(){
+    public List<User> getUsers() {
         log.info("List of users sent");
         return users;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user){
+    public User updateUser(@RequestBody User user) {
         log.info("user " + user + " updated");
         return user;
     }
-    
-    protected boolean validateUser(User user){
+
+    protected boolean validateUser(User user) {
         return !user.getEmail().isBlank() &&
                 user.getEmail().contains("@") &&
                 !user.getLogin().isBlank() &&
