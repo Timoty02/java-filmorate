@@ -6,19 +6,22 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    List<Film> films = new ArrayList<>();
+    Map<Integer, Film> films = new HashMap<>();
+    int id = 1;
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
         if (validateFilm(film)) {
-            films.add(film);
+            film.setId(id);
+            id++;
+            films.put(film.getId(), film);
             log.info("Added new film - " + film);
             return film;
         } else {
@@ -28,15 +31,26 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<Film> getFilms() {
+    public Map<Integer, Film> getFilms() {
         log.info("List of films sent");
         return films;
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        log.info("film " + film + " updated");
-        return film;
+        if (films.containsKey(film.getId())) {
+            if (validateFilm(film)) {
+                films.put(film.getId(), film);
+                log.info("film " + film + " updated");
+                return film;
+            } else {
+                log.warn("Unable to update film - " + film + " due to validation error");
+                throw new ValidationException("Wrong film info");
+            }
+        } else {
+            log.warn("Unable to update film - " + film + " does not exist");
+            throw new ValidationException("film does not exist");
+        }
     }
 
     protected boolean validateFilm(Film film) {
