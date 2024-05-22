@@ -6,14 +6,14 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
-    Map<Integer, User> users = new HashMap<>();
+    List<User> users = new ArrayList<>();
     int id = 1;
 
     @PostMapping
@@ -24,7 +24,7 @@ public class UserController {
             }
             user.setId(id);
             id++;
-            users.put(user.getId(), user);
+            users.add(user);
             log.info("Added new user - " + user);
             return user;
         } else {
@@ -35,29 +35,34 @@ public class UserController {
     }
 
     @GetMapping
-    public Map<Integer, User> getUsers() {
+    public List<User> getUsers() {
         log.info("List of users sent");
         return users;
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            if (validateUser(user)) {
-                if (user.getName().isBlank()) {
-                    user.setName(user.getLogin());
+        for (User user1 :
+                users) {
+            if (user1.getId() == (user.getId())) {
+                if (validateUser(user)) {
+                    if (user.getName().isBlank()) {
+                        user.setName(user.getLogin());
+                    }
+                    users.add(user);
+                    log.info("user " + user + " updated");
+                    return user;
+                } else {
+                    log.warn("Unable to update user - " + user + " due to validation error");
+                    throw new ValidationException("Wrong user info");
                 }
-                users.put(user.getId(), user);
-                log.info("user " + user + " updated");
-                return user;
-            } else {
-                log.warn("Unable to update user - " + user + " due to validation error");
-                throw new ValidationException("Wrong user info");
             }
-        } else {
-            log.warn("Unable to update user - " + user + " does not exist");
-            throw new ValidationException("User does not exist");
         }
+
+        log.warn("Unable to update user - " + user + " does not exist");
+        throw new ValidationException("User does not exist");
+
+
     }
 
     protected boolean validateUser(User user) {

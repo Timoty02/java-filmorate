@@ -6,14 +6,14 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    Map<Integer, Film> films = new HashMap<>();
+    List<Film> films = new ArrayList<>();
     int id = 1;
 
     @PostMapping
@@ -21,7 +21,7 @@ public class FilmController {
         if (validateFilm(film)) {
             film.setId(id);
             id++;
-            films.put(film.getId(), film);
+            films.add(film);
             log.info("Added new film - " + film);
             return film;
         } else {
@@ -31,26 +31,30 @@ public class FilmController {
     }
 
     @GetMapping
-    public Map<Integer, Film> getFilms() {
+    public List<Film> getFilms() {
         log.info("List of films sent");
         return films;
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            if (validateFilm(film)) {
-                films.put(film.getId(), film);
-                log.info("film " + film + " updated");
-                return film;
-            } else {
-                log.warn("Unable to update film - " + film + " due to validation error");
-                throw new ValidationException("Wrong film info");
+        for (Film film1 :
+                films) {
+            if (film1.getId() == film.getId()) {
+                if (validateFilm(film)) {
+                    films.add(film);
+                    log.info("film " + film + " updated");
+                    return film;
+                } else {
+                    log.warn("Unable to update film - " + film + " due to validation error");
+                    throw new ValidationException("Wrong film info");
+                }
             }
-        } else {
-            log.warn("Unable to update film - " + film + " does not exist");
-            throw new ValidationException("film does not exist");
         }
+
+        log.warn("Unable to update film - " + film + " does not exist");
+        throw new ValidationException("film does not exist");
+
     }
 
     protected boolean validateFilm(Film film) {
