@@ -10,11 +10,11 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class FilmControllerTest {
 
@@ -53,9 +53,7 @@ public class FilmControllerTest {
         film.setDescription("testDescription");
         film.setReleaseDate(LocalDate.now().minusYears(20));
         film.setDuration(120);
-
         Mockito.when(filmController.getFilms()).thenReturn(List.of(film));
-
         mockMvc.perform(get("/films"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(film.getId()));
@@ -87,11 +85,8 @@ public class FilmControllerTest {
         film.setDescription("testDescription");
         film.setReleaseDate(LocalDate.now().minusYears(20));
         film.setDuration(120);
-
         Mockito.when(filmController.validateFilm(Mockito.any(Film.class))).thenReturn(true);
-
         boolean result = filmController.validateFilm(film);
-
-        assert(result);
+        assert (result);
     }
 }
