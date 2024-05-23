@@ -65,7 +65,7 @@ public class UserController {
 
     }
 
-    protected boolean validateUser(User user) {
+    public boolean validateUser(User user) {
         return !user.getEmail().isBlank() &&
                 user.getEmail().contains("@") &&
                 !user.getLogin().isBlank() &&
