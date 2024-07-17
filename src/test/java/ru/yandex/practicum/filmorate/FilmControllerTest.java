@@ -53,7 +53,7 @@ public class FilmControllerTest {
         film.setDescription("testDescription");
         film.setReleaseDate(LocalDate.now().minusYears(20));
         film.setDuration(120);
-        Mockito.when(filmController.getFilms()).thenReturn(List.of(film));
+        Mockito.when(filmController.getFilms().values()).thenReturn(List.of(film));
         mockMvc.perform(get("/films"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(film.getId()));
@@ -75,18 +75,5 @@ public class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(film.getId()));
-    }
-
-    @Test
-    public void testValidateFilm() {
-        Film film = new Film();
-        film.setId(1);
-        film.setName("testFilm");
-        film.setDescription("testDescription");
-        film.setReleaseDate(LocalDate.now().minusYears(20));
-        film.setDuration(120);
-        Mockito.when(filmController.validateFilm(Mockito.any(Film.class))).thenReturn(true);
-        boolean result = filmController.validateFilm(film);
-        assert (result);
     }
 }

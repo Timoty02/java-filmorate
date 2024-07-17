@@ -1,75 +1,53 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
-    List<User> users = new ArrayList<>();
-    int id = 1;
+    @Autowired
+    UserService userService;
 
     @PostMapping
     public User addUser(@RequestBody User user) {
-        if (validateUser(user)) {
-            if (user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            user.setId(id);
-            id++;
-            users.add(user);
-            log.info("Added new user - " + user);
-            return user;
-        } else {
-
+        try {
+            userService.addUser(user);
+        } catch (ValidationException e) {
             log.warn("Unable to add user - " + user + " due to validation error");
             throw new ValidationException("Wrong user info");
         }
+        log.info("Added new user - " + user);
+        return user;
     }
 
     @GetMapping
-    public List<User> getUsers() {
+    public Map<Integer, User> getUsers() {
         log.info("List of users sent");
-        return users;
+        return userService.getUsers();
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        for (User user1 :
-                users) {
-            if (user1.getId() == (user.getId())) {
-                if (validateUser(user)) {
-                    if (user.getName().isBlank()) {
-                        user.setName(user.getLogin());
-                    }
-                    users.add(user);
-                    log.info("user " + user + " updated");
-                    return user;
-                } else {
-                    log.warn("Unable to update user - " + user + " due to validation error");
-                    throw new ValidationException("Wrong user info");
-                }
-            }
+        try {
+            userService.updateUser(user);
+        } catch (ValidationException e) {
+            log.warn("Unable to update user - " + user + " due to validation error");
+            throw new ValidationException("Wrong user info");
+        } catch (NotFoundException e) {
+            log.warn("Unable to update user - " + user + " does not exist");
+            throw new NotFoundException("User does not exist");
         }
-
-        log.warn("Unable to update user - " + user + " does not exist");
-        throw new ValidationException("User does not exist");
-
-
-    }
-
-    public boolean validateUser(User user) {
-        return !user.getEmail().isBlank() &&
-                user.getEmail().contains("@") &&
-                !user.getLogin().isBlank() &&
-                !user.getLogin().contains(" ") &&
-                user.getBirthday().isBefore(LocalDate.now());
+        log.info("user " + user + " updated");
+        return user;
     }
 }
+

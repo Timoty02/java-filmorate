@@ -1,68 +1,54 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    List<Film> films = new ArrayList<>();
-    int id = 1;
+    @Autowired
+    FilmService filmService;
+
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
-        if (validateFilm(film)) {
-            film.setId(id);
-            id++;
-            films.add(film);
-            log.info("Added new film - " + film);
-            return film;
-        } else {
+        try {
+            filmService.addFilm(film);
+        } catch (ValidationException e) {
             log.warn("Unable to add film - " + film + " due to validation error");
             throw new ValidationException("Wrong film info");
         }
+        log.info("Added new film - " + film);
+        return film;
     }
 
     @GetMapping
-    public List<Film> getFilms() {
+    public Map<Integer, Film> getFilms() {
         log.info("List of films sent");
-        return films;
+        return filmService.getFilms();
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        for (Film film1 :
-                films) {
-            if (film1.getId() == film.getId()) {
-                if (validateFilm(film)) {
-                    films.add(film);
-                    log.info("film " + film + " updated");
-                    return film;
-                } else {
-                    log.warn("Unable to update film - " + film + " due to validation error");
-                    throw new ValidationException("Wrong film info");
-                }
-            }
+        try {
+            filmService.updateFilm(film);
+        } catch (ValidationException e) {
+            log.warn("Unable to update film - " + film + " due to validation error");
+            throw new ValidationException("Wrong film info");
+        } catch (NotFoundException e) {
+            log.warn("Unable to update film - " + film + " does not exist");
+            throw new NotFoundException("Film does not exist");
         }
-
-        log.warn("Unable to update film - " + film + " does not exist");
-        throw new ValidationException("film does not exist");
-
+        log.info("film " + film + " updated");
+        return film;
     }
-
-    public boolean validateFilm(Film film) {
-        return !film.getName().isBlank() &&
-                film.getDescription().length() <= 200 &&
-                film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 27)) &&
-                film.getDuration() >= 0;
-    }
-
 
 }

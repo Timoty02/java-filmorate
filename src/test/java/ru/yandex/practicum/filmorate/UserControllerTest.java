@@ -55,7 +55,7 @@ public class UserControllerTest {
         user.setEmail("test@test.com");
         user.setBirthday(LocalDate.now().minusYears(20));
 
-        Mockito.when(userController.getUsers()).thenReturn(List.of(user));
+        Mockito.when(userController.getUsers().values()).thenReturn(List.of(user));
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
@@ -79,18 +79,5 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(user.getId()));
-    }
-
-    @Test
-    public void testValidateUser() {
-        User user = new User();
-        user.setId(1);
-        user.setLogin("testLogin");
-        user.setName("testName");
-        user.setEmail("test@test.com");
-        user.setBirthday(LocalDate.now().minusYears(20));
-        Mockito.when(userController.validateUser(Mockito.any(User.class))).thenReturn(true);
-        boolean result = userController.validateUser(user);
-        assert (result);
     }
 }
