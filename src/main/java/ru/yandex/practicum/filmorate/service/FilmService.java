@@ -81,7 +81,7 @@ public class FilmService extends ru.yandex.practicum.filmorate.service.Service {
     }
 
     public List<Film> getMostPopulars(int count) {
-        return ((InMemoryFilmStorage) filmStorage).getMostPopular(count);
+        return ((InMemoryFilmStorage) filmStorage).getMostPopular(count).reversed();
     }
 
     public boolean validateFilm(Film film) {

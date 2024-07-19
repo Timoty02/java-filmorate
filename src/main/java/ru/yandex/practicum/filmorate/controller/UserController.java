@@ -31,12 +31,12 @@ public class UserController {
     }
 
     @GetMapping
-    public Map<Integer, User> getUsers() {
+    public List<User> getUsers() {
         log.info("List of users sent");
-        return userService.getUsers();
+        return userService.getUsers().values().stream().toList();
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public User getUserById(@PathVariable int id) {
         try {
             User user = userService.getUserById(id);
@@ -64,7 +64,7 @@ public class UserController {
 
     }
 
-    @PutMapping("/users/{id}/friends/{friendId}")
+    @PutMapping("/{id}/friends/{friendId}")
     public User addFriend(@PathVariable int id, @PathVariable int friendId) {
         try {
             User user = userService.addFriend(id, friendId);
@@ -79,7 +79,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/users/{id}/friends/{friendId}")
+    @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
         try {
             userService.removeFriend(id, friendId);
@@ -88,12 +88,12 @@ public class UserController {
             log.warn("Unable to remove friend user - " + e.getId() + " does not exist");
             throw new NotFoundException(e.getMessage());
         } catch (ValidationException e) {
-            log.warn("Unable to add friend users aren't friends");
-            throw new ValidationException("Users aren't friends");
+            log.warn("Unable to remove friend users aren't friends");
+            //throw new ValidationException("Users aren't friends");
         }
     }
 
-    @GetMapping("/users/{id}/friends")
+    @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable int id) {
         try {
             return userService.getFriends(id);
@@ -103,7 +103,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users/{id}/friends/common/{otherId}")
+    @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
         try {
             return userService.getCommonFriends(id, otherId);

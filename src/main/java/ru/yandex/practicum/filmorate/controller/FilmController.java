@@ -32,12 +32,12 @@ public class FilmController {
     }
 
     @GetMapping
-    public Map<Integer, Film> getFilms() {
+    public List<Film> getFilms() {
         log.info("List of films sent");
-        return filmService.getFilms();
+        return filmService.getFilms().values().stream().toList();
     }
 
-    @GetMapping("/films/{id}")
+    @GetMapping("/{id}")
     public Film getFilmById(@PathVariable int id) {
         try {
             Film film = filmService.getFilmById(id);
@@ -64,7 +64,7 @@ public class FilmController {
         return film;
     }
 
-    @PutMapping("/films/{id}/like/{userId}")
+    @PutMapping("/{id}/like/{userId}")
     public Film addLike(@PathVariable int id, @PathVariable int userId) {
         try {
             Film film = filmService.addLike(id, userId);
@@ -79,7 +79,7 @@ public class FilmController {
         }
     }
 
-    @DeleteMapping("/films/{id}/like/{userId}")
+    @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable int id, @PathVariable int userId) {
         try {
             filmService.removeLike(id, userId);
@@ -93,8 +93,8 @@ public class FilmController {
         log.info("User " + userId + " unliked film " + id);
     }
 
-    @GetMapping("/films/popular?count={count}")
-    public List<Film> getMostPopular(@PathVariable int count) {
+    @GetMapping("/popular")
+    public List<Film> getMostPopular(@RequestParam(defaultValue = "10") int count) {
         try {
             List<Film> films = filmService.getMostPopulars(count);
             log.info("List sent");
