@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
@@ -15,9 +13,7 @@ import java.util.Set;
 
 @Service
 
-public class FilmService {
-    @Autowired
-    FilmStorage filmStorage;
+public class FilmService extends ru.yandex.practicum.filmorate.service.Service {
 
 
     public Film addFilm(Film film) {
@@ -51,12 +47,20 @@ public class FilmService {
 
     public Film addLike(int filmId, int userId) {
         Film film = filmStorage.getFilms().get(filmId);
-        Set<Integer> filmLikes = film.getLikes();
-        if (filmLikes.contains(userId)) {
-            throw new ValidationException("User already liked that film");
+        if (film == null) {
+            throw new NotFoundException("Film not found", filmId);
         } else {
-            film.addLike(userId);
-            return film;
+            Set<Integer> filmLikes = film.getLikes();
+            if (userStorage.getUsers().containsKey(userId)) {
+                if (filmLikes.contains(userId)) {
+                    throw new ValidationException("User already liked that film");
+                } else {
+                    film.addLike(userId);
+                    return film;
+                }
+            } else {
+                throw new NotFoundException("User not found", userId);
+            }
         }
     }
 
@@ -76,8 +80,8 @@ public class FilmService {
         return filmStorage.getFilmById(id);
     }
 
-    public List<Film> getMostPopulars() {
-        return ((InMemoryFilmStorage) filmStorage).getMostPopular();
+    public List<Film> getMostPopulars(int count) {
+        return ((InMemoryFilmStorage) filmStorage).getMostPopular(count);
     }
 
     public boolean validateFilm(Film film) {

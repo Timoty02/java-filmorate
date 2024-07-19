@@ -2,18 +2,19 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @Service
-public class UserService {
+public class UserService extends ru.yandex.practicum.filmorate.service.Service {
     @Autowired
     UserStorage userStorage;
 
@@ -30,7 +31,7 @@ public class UserService {
 
 
     public User updateUser(User user) {
-        if (userStorage.getUsers().containsValue(user)) {
+        if (userStorage.getUsers().containsKey(user.getId())) {
             if (validateUser(user)) {
                 userStorage.updateUser(user, user.getId());
                 return user;
@@ -42,57 +43,89 @@ public class UserService {
         }
     }
 
-    public void addFriend(int firstId, int secondId) {
+    public User addFriend(int firstId, int secondId) {
         Map<Integer, User> users = userStorage.getUsers();
-        if (users.keySet().containsAll(List.of(firstId, secondId))) {
-            User user1 = users.get(firstId);
-            User user2 = users.get(secondId);
-            if (!user1.getFriends().contains(secondId) & !user2.getFriends().contains(firstId)) {
-                user1.addFriend(secondId);
-                user2.addFriend(firstId);
+        if (users.containsKey(firstId)) {
+            if (users.containsKey(secondId)) {
+                User user1 = users.get(firstId);
+                User user2 = users.get(secondId);
+                if (!user1.getFriends().contains(secondId) & !user2.getFriends().contains(firstId)) {
+                    user1.addFriend(secondId);
+                    user2.addFriend(firstId);
+                    return user1;
+                } else {
+                    throw new ValidationException("Users are already friends");
+                }
             } else {
-                throw new ValidationException("Users are already friends");
+                throw new NotFoundException("User doesn't exist", secondId);
             }
         } else {
-            throw new NotFoundException("One or both users don't exist");
+            throw new NotFoundException("User doesn't exist", firstId);
         }
     }
 
     public void removeFriend(int firstId, int secondId) {
         Map<Integer, User> users = userStorage.getUsers();
-        if (users.keySet().containsAll(List.of(firstId, secondId))) {
-            User user1 = users.get(firstId);
-            User user2 = users.get(secondId);
-            if (user1.getFriends().contains(secondId) & user2.getFriends().contains(firstId)) {
-                user1.removeFriend(secondId);
-                user2.removeFriend(firstId);
+        if (users.containsKey(firstId)) {
+            if (users.containsKey(secondId)) {
+                User user1 = users.get(firstId);
+                User user2 = users.get(secondId);
+                if (user1.getFriends().contains(secondId) & user2.getFriends().contains(firstId)) {
+                    user1.removeFriend(secondId);
+                    user2.removeFriend(firstId);
+                } else {
+                    throw new ValidationException("Users aren't friends");
+                }
             } else {
-                throw new ValidationException("Users aren't friends");
+                throw new NotFoundException("User doesn't exist", secondId);
             }
         } else {
-            throw new NotFoundException("One or both users don't exist");
+            throw new NotFoundException("User doesn't exist", firstId);
         }
     }
 
-    public Set<Integer> getMutualFriends(int firstId, int secondId) {
+    public List<User> getFriends(int id) {
+        if (userStorage.getUsers().containsKey(id)) {
+            Set<Integer> friendsIds = userStorage.getUserById(id).getFriends();
+            List<User> friends = new ArrayList<>();
+            for (int i :
+                    friendsIds) {
+                friends.add(userStorage.getUserById(i));
+            }
+            return friends;
+        } else {
+            throw new NotFoundException("User doesn't exist", id);
+        }
+    }
+
+    public List<User> getCommonFriends(int firstId, int secondId) {
         Map<Integer, User> users = userStorage.getUsers();
-        if (users.keySet().containsAll(List.of(firstId, secondId))) {
-            User user1 = users.get(firstId);
-            User user2 = users.get(secondId);
-            Set<Integer> mutualFriends = user1.getFriends();
-            mutualFriends.retainAll(user2.getFriends());
-            if (!mutualFriends.isEmpty()) {
-                return mutualFriends;
+        if (users.containsKey(firstId)) {
+            if (users.containsKey(secondId)) {
+                User user1 = users.get(firstId);
+                User user2 = users.get(secondId);
+                Set<Integer> mutualFriends = user1.getFriends();
+                mutualFriends.retainAll(user2.getFriends());
+                List<User> friends = new ArrayList<>();
+                for (int i :
+                        mutualFriends) {
+                    friends.add(userStorage.getUserById(i));
+                }
+                return friends;
             } else {
-                throw new NotFoundException("Mutual friends not found");
+                throw new NotFoundException("User doesn't exist", secondId);
             }
         } else {
-            throw new NotFoundException("One or both users don't exist");
+            throw new NotFoundException("User doesn't exist", firstId);
         }
     }
 
     public User getUserById(int id) {
-        return userStorage.getUserById(id);
+        if (userStorage.getUsers().containsKey(id)) {
+            return userStorage.getUserById(id);
+        } else {
+            throw new NotFoundException("User doesn't exist");
+        }
     }
 
     public Map<Integer, User> getUsers() {

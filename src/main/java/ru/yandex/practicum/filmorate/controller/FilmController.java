@@ -3,11 +3,12 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -36,6 +37,18 @@ public class FilmController {
         return filmService.getFilms();
     }
 
+    @GetMapping("/films/{id}")
+    public Film getFilmById(@PathVariable int id) {
+        try {
+            Film film = filmService.getFilmById(id);
+            log.info("Film sent");
+            return film;
+        } catch (NotFoundException e) {
+            log.warn("Unable to sent film - " + id + " does not exist");
+            throw new NotFoundException("Film does not exist");
+        }
+    }
+
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         try {
@@ -51,4 +64,44 @@ public class FilmController {
         return film;
     }
 
+    @PutMapping("/films/{id}/like/{userId}")
+    public Film addLike(@PathVariable int id, @PathVariable int userId) {
+        try {
+            Film film = filmService.addLike(id, userId);
+            log.info("User " + userId + " liked film " + id);
+            return film;
+        } catch (ValidationException e) {
+            log.warn("User " + userId + " already liked that film");
+            throw new ValidationException("User already liked that film");
+        } catch (NotFoundException e) {
+            log.warn("User " + userId + " does not exist");
+            throw new NotFoundException("User does not exist");
+        }
+    }
+
+    @DeleteMapping("/films/{id}/like/{userId}")
+    public void removeLike(@PathVariable int id, @PathVariable int userId) {
+        try {
+            filmService.removeLike(id, userId);
+        } catch (ValidationException e) {
+            log.warn("User " + userId + " didn't like that film");
+            throw new ValidationException("User didn't like that film");
+        } catch (NotFoundException e) {
+            log.warn("User " + userId + " does not exist");
+            throw new NotFoundException("User does not exist");
+        }
+        log.info("User " + userId + " unliked film " + id);
+    }
+
+    @GetMapping("/films/popular?count={count}")
+    public List<Film> getMostPopular(@PathVariable int count) {
+        try {
+            List<Film> films = filmService.getMostPopulars(count);
+            log.info("List sent");
+            return films;
+        } catch (RuntimeException e) {
+            log.warn("Unknown error");
+            throw new RuntimeException(e.getMessage(), e.getCause());
+        }
+    }
 }
