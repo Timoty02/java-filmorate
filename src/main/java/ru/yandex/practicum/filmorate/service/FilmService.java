@@ -65,7 +65,7 @@ public class FilmService extends ru.yandex.practicum.filmorate.service.Service {
     }
 
     public Film removeLike(int filmId, int userId) {
-        if(!filmStorage.getFilms().containsKey(filmId)){
+        if (!filmStorage.getFilms().containsKey(filmId)) {
             throw new NotFoundException("Film not found");
         } else {
             Film film = filmStorage.getFilms().get(filmId);
