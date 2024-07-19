@@ -65,18 +65,22 @@ public class FilmService extends ru.yandex.practicum.filmorate.service.Service {
     }
 
     public Film removeLike(int filmId, int userId) {
-        Film film = filmStorage.getFilms().get(filmId);
-        Set<Integer> filmLikes = film.getLikes();
-        if (userStorage.getUsers().containsKey(userId)) {
-            if (filmLikes.contains(userId)) {
-                filmLikes.remove(userId);
-                film.setLikes(filmLikes);
-                return film;
-            } else {
-                throw new ValidationException("User didn't like that film");
-            }
+        if(!filmStorage.getFilms().containsKey(filmId)){
+            throw new NotFoundException("Film not found");
         } else {
-            throw new ValidationException("User not found");
+            Film film = filmStorage.getFilms().get(filmId);
+            Set<Integer> filmLikes = film.getLikes();
+            if (userStorage.getUsers().containsKey(userId)) {
+                if (filmLikes.contains(userId)) {
+                    filmLikes.remove(userId);
+                    film.setLikes(filmLikes);
+                    return film;
+                } else {
+                    throw new ValidationException("User didn't like that film");
+                }
+            } else {
+                throw new NotFoundException("User not found", userId);
+            }
         }
     }
 

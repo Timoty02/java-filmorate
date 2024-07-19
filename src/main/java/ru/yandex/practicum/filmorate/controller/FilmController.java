@@ -84,7 +84,7 @@ public class FilmController {
             filmService.removeLike(id, userId);
         } catch (ValidationException e) {
             log.warn("User " + userId + " didn't like that film");
-            throw new ValidationException("User didn't like that film");
+            throw new ValidationException(e.getMessage());
         } catch (NotFoundException e) {
             log.warn("User " + userId + " does not exist");
             throw new NotFoundException("User does not exist");
