@@ -65,7 +65,7 @@ public class FilmController {
     }
 
     @PutMapping(pathLike)
-    public Film addLike(@PathVariable int id, @PathVariable int userId) {
+    public Film addLike(@PathVariable int id, @PathVariable("user-id") int userId) {
         try {
             Film film = filmService.addLike(id, userId);
             log.info("User " + userId + " liked film " + id);
