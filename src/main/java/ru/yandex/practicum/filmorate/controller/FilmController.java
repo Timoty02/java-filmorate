@@ -17,7 +17,7 @@ public class FilmController {
     @Autowired
     FilmService filmService;
 
-
+    protected final String pathLike = "/{id}/like/{user-id}";
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
         try {
@@ -63,7 +63,7 @@ public class FilmController {
         return film;
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping(pathLike)
     public Film addLike(@PathVariable int id, @PathVariable int userId) {
         try {
             Film film = filmService.addLike(id, userId);
@@ -78,8 +78,8 @@ public class FilmController {
         }
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
-    public void removeLike(@PathVariable int id, @PathVariable int userId) {
+    @DeleteMapping(pathLike)
+    public void removeLike(@PathVariable int id, @PathVariable("user-id") int userId) {
         try {
             filmService.removeLike(id, userId);
         } catch (ValidationException e) {
