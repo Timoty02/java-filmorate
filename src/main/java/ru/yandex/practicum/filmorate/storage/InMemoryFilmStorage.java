@@ -30,10 +30,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public List<Film> getMostPopular(int count) {
-        return films.values().stream().
-                sorted(Comparator.comparingInt((Film film) -> film.getLikes().size())).
-                limit(count).
-                collect(Collectors.toList());
+        return films.values().stream()
+                .sorted(Comparator.comparingInt((Film film) -> film.getLikes().size()))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     public Film getFilmById(int filmId) {
