@@ -23,42 +23,42 @@ public class FilmDbStorage {
     }
 
     public List<Film> getAllFilms() {
-        String sql = "SELECT f.*, r.name AS rating_name, COUNT(l.user_id) AS likes_count, GROUP_CONCAT(g.name) AS genres " +
-                "FROM films f " +
-                "LEFT JOIN likes l ON f.id = l.film_id " +
-                "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
-                "LEFT JOIN genres g ON fg.genre_id = g.id " +
-                "LEFT JOIN rating r ON f.rating_id = r.id " +
-                "GROUP BY f.id";
+        String sql = "SELECT f.*, r.\"name\" AS rating_name, COUNT(l.\"user_id\") AS likes_count, GROUP_CONCAT(g.\"name\") AS genres " +
+                "FROM \"films\" f " +
+                "LEFT JOIN \"likes\" l ON f.\"id\" = l.\"film_id\" " +
+                "LEFT JOIN \"film_genres\" fg ON f.\"id\" = fg.\"film_id\" " +
+                "LEFT JOIN \"genres\" g ON fg.\"genre_id\" = g.\"id\" " +
+                "LEFT JOIN \"rating\" r ON f.\"rating_id\" = r.\"id\" " +
+                "GROUP BY f.\"id\"";
         return jdbcTemplate.query(sql, new FilmRowMapper());
     }
 
     public Film getFilmById(int id) {
-        String sql = "SELECT f.*, r.name AS rating_name, COUNT(l.user_id) AS likes_count, GROUP_CONCAT(g.name) AS genres " +
-                "FROM films f " +
-                "LEFT JOIN likes l ON f.id = l.film_id " +
-                "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
-                "LEFT JOIN genres g ON fg.genre_id = g.id " +
-                "LEFT JOIN rating r ON f.rating_id = r.id " +
-                "WHERE f.id = ? " +
-                "GROUP BY f.id";
+        String sql = "SELECT f.*, r.\"name\" AS rating_name, COUNT(l.\"user_id\") AS likes_count, GROUP_CONCAT(g.\"name\") AS genres " +
+                "FROM \"films\" f " +
+                "LEFT JOIN \"likes\" l ON f.\"id\" = l.\"film_id\" " +
+                "LEFT JOIN \"film_genres\" fg ON f.\"id\" = fg.\"film_id\" " +
+                "LEFT JOIN \"genres\" g ON fg.\"genre_id\" = g.\"id\" " +
+                "LEFT JOIN \"rating\" r ON f.\"rating_id\" = r.\"id\" " +
+                "WHERE f.\"id\" = ? " +
+                "GROUP BY f.\"id\"";
         return jdbcTemplate.queryForObject(sql, new FilmRowMapper(), id);
     }
 
     public void addFilm(Film film) {
-        String sql = "INSERT INTO films (name, description, release_date, duration, rating_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO \"films\" (\"name\", \"description\", \"release_date\", \"duration\", \"rating_id\") VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
                 film.getMpa().getId());
     }
 
     public void updateFilm(Film film) {
-        String sql = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, rating_id = ? WHERE id = ?";
+        String sql = "UPDATE \"films\" SET \"name\" = ?, \"description\" = ?, \"release_date\" = ?, \"duration\" = ?, \"rating_id\" = ? WHERE \"id\" = ?";
         jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
                 film.getMpa().getId());
     }
 
     public void deleteFilm(int id) {
-        String sql = "DELETE FROM films WHERE id = ?";
+        String sql = "DELETE FROM \"films\" WHERE \"id\" = ?";
         jdbcTemplate.update(sql, id);
     }
 

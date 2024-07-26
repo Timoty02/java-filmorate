@@ -23,12 +23,17 @@ public class MpaService {
         return mpaStorage.getAllMpa();
     }
 
-    public Map<Integer, Mpa> getMpaById(int id) {
-        Mpa mpa = mpaStorage.getMpaById(id);
-        if (mpa == null) {
+    public Mpa getMpaById(int id) {
+        try {
+            Mpa mpa = mpaStorage.getMpaById(id);
+            if (mpa == null) {
+                throw new NotFoundException("MPA rating with ID " + id + " not found.");
+            }
+            //return Map.of(mpa.getId(), mpa.getName());
+            return mpa;
+        } catch (Exception e) {
             throw new NotFoundException("MPA rating with ID " + id + " not found.");
         }
-        return Map.of(mpa.getId(), mpa);
     }
 
     private void validateMpa(Mpa mpa) {

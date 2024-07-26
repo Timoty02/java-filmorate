@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-@Component("ratingStorage")
+@Component
+@Qualifier("mpaStorage")
 public class MpaStorage {
     private final JdbcTemplate jdbcTemplate;
     @Autowired
@@ -24,17 +26,17 @@ public class MpaStorage {
     }
 
     public Mpa getMpaById(int id) {
-        String sql = "SELECT * FROM rating WHERE id = ?";
+        String sql = "SELECT * FROM \"rating\" WHERE \"id\" = ?";
         return jdbcTemplate.queryForObject(sql, new MpaRowMapper(), id);
     }
     public Map<Integer, Mpa> getAllMpa() {
-        String sql = "SELECT * FROM rating";
+        String sql = "SELECT * FROM \"rating\"";
         List<Mpa> mpas = jdbcTemplate.query(sql, new MpaStorage.MpaRowMapper());
         return mpas.stream()
                 .collect(TreeMap::new, (map, mpa) -> map.put(mpa.getId(), mpa), Map::putAll);
     }
     
-    private static class MpaRowMapper implements RowMapper<Mpa> {
+    static class MpaRowMapper implements RowMapper<Mpa> {
         @Override
         public Mpa mapRow(ResultSet rs, int rowNum) throws SQLException {
             Mpa mpa = new Mpa();
