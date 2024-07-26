@@ -15,8 +15,6 @@ import java.util.Set;
 
 @Service
 public class UserService extends ru.yandex.practicum.filmorate.service.Service {
-    @Autowired
-    UserStorage userStorage;
 
     public User addUser(User user) {
         if (validateUser(user)) {
