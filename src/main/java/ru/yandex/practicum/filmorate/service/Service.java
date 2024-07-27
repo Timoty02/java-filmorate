@@ -5,13 +5,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-public class Service {
+public abstract class Service {
     @Autowired
-    //@Qualifier("filmDbStorage")
-            @Qualifier("inMemoryFilmStorage")
-    FilmStorage filmStorage;
+    @Qualifier("filmDbStorage")
+    protected final FilmStorage filmStorage;
     @Autowired
-    //@Qualifier("userDbStorage")
-            @Qualifier("inMemoryUserStorage")
-    UserStorage userStorage;
+    @Qualifier("userDbStorage")
+    protected final UserStorage userStorage;
+
+    protected Service(FilmStorage filmStorage, UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+    }
 }

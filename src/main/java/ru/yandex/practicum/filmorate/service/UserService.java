@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
@@ -15,6 +16,10 @@ import java.util.Set;
 
 @Service
 public class UserService extends ru.yandex.practicum.filmorate.service.Service {
+    @Autowired
+    public UserService(FilmStorage filmStorage, UserStorage userStorage) {
+        super(filmStorage, userStorage);
+    }
 
     public User addUser(User user) {
         if (validateUser(user)) {

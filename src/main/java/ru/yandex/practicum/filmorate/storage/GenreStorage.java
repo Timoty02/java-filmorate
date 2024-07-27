@@ -9,8 +9,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+
 @Component
 @Qualifier("genreStorage")
 public class GenreStorage {
@@ -20,11 +19,10 @@ public class GenreStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Map<Integer, Genre> getAllGenres() {
+    public List<Genre> getAllGenres() {
         String sql = "SELECT * FROM \"genres\"";
         List<Genre> genres = jdbcTemplate.query(sql, new GenreRowMapper());
-        return genres.stream()
-                .collect(TreeMap::new, (map, genre) -> map.put(genre.getId(), genre), Map::putAll);
+        return genres;
     }
 
     public Genre getGenreById(int id) {

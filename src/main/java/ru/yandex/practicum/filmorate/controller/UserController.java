@@ -20,13 +20,14 @@ public class UserController {
     @PostMapping
     public User addUser(@RequestBody User user) {
         try {
-            userService.addUser(user);
+            User addedUser = userService.addUser(user);
+            log.info("Added new user - " + user);
+            return addedUser;
         } catch (ValidationException e) {
             log.warn("Unable to add user - " + user + " due to validation error");
             throw new ValidationException("Wrong user info");
         }
-        log.info("Added new user - " + user);
-        return user;
+
     }
 
     @GetMapping

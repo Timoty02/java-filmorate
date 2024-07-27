@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +26,14 @@ public class User {
 
     public User() {
 
+    }
+
+    public User(int id, String email, String login, String name, Date birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday.toLocalDate();
     }
 
     public void addFriend(int userId) {

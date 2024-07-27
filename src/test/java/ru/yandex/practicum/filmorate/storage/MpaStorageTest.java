@@ -8,13 +8,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -35,7 +31,7 @@ class MpaStorageIntegrationTest {
         try {
             Mpa actualMpa = mpaStorage.getMpaById(1);
             assertEquals(expectedMpa, actualMpa);
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
 
@@ -48,7 +44,7 @@ class MpaStorageIntegrationTest {
         mpa1.setId(1);
         mpa1.setName("Mpa 1");
         // When
-        Map<Integer, Mpa> allMpa = mpaStorage.getAllMpa();
+        List<Mpa> allMpa = mpaStorage.getAllMpa();
         // Then
         assertEquals(2, allMpa.size());
 
