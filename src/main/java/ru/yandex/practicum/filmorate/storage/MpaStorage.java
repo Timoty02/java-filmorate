@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-@Qualifier("mpaStorage")
+@Qualifier("MpaStorage")
 public class MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
