@@ -28,7 +28,7 @@ public class UserDbStorage implements UserStorage {
 
     public User getUserById(int id) {
         String sql = "SELECT * FROM \"users\" WHERE \"id\" = ?";
-        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), new Object[]{id});   //, new Object[]{id}, (resultSet, i) -> new User(resultSet.getInt("id"), resultSet.getString("email"), resultSet.getString("login"), resultSet.getString("name"), resultSet.getDate("birthday")));
+        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);   //, new Object[]{id}, (resultSet, i) -> new User(resultSet.getInt("id"), resultSet.getString("email"), resultSet.getString("login"), resultSet.getString("name"), resultSet.getDate("birthday")));
         if (user != null) {
             String sql1 = "SELECT * FROM \"friends\" f JOIN \"users\" u ON f.\"receiving_user_id\" = u.\"id\" WHERE \"requested_user_id\" = ?";
             Set<Integer> friends = jdbcTemplate.query(sql1, new Object[]{id},
@@ -53,14 +53,14 @@ public class UserDbStorage implements UserStorage {
         String sql = "INSERT INTO \"users\" (\"email\", \"login\", \"name\", \"birthday\") VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), Date.valueOf(user.getBirthday()));
         String sql1 = "SELECT * FROM \"users\" ORDER BY \"id\" DESC LIMIT 1;";
-        user = jdbcTemplate.queryForObject(sql1, (resultSet, i) -> new User(resultSet.getInt("id"), resultSet.getString("email"), resultSet.getString("login"), resultSet.getString("name"), resultSet.getDate("birthday")));
-        return user;
+        User user1 = jdbcTemplate.queryForObject(sql1, new UserRowMapper());//(resultSet, i) -> new User(resultSet.getInt("id"), resultSet.getString("email"), resultSet.getString("login"), resultSet.getString("name"), resultSet.getDate("birthday")));
+        return user1;
     }
 
     public User updateUser(User user, int id) {
         String sql = "UPDATE \"users\" SET \"email\" = ?, \"login\" = ?, \"name\" = ?, \"birthday\" = ? WHERE \"id\" = ?";
         jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), Date.valueOf(user.getBirthday()), id);
-        return user;
+        return getUserById(id);
     }
 
     public void deleteUser(int id) {
@@ -100,6 +100,12 @@ public class UserDbStorage implements UserStorage {
 
     public void removeFriend(int requestedUserId, int receivingUserId) {
         try {
+            getUserById(receivingUserId);
+            getUserById(requestedUserId);
+        } catch (DataAccessException e) {
+            throw new NotFoundException("User not found");
+        }
+        try {
             String sql = "DELETE FROM \"friends\" WHERE \"requested_user_id\" = ? AND \"receiving_user_id\" = ?";
             jdbcTemplate.update(sql, requestedUserId, receivingUserId);
         } catch (DataAccessException e) {
@@ -108,7 +114,7 @@ public class UserDbStorage implements UserStorage {
 
     }
 
-    public List<Integer> getCommonFriends(int userId1, int userId2) {
+    public List<User> getCommonFriends(int userId1, int userId2) {
         String sql = """
                 SELECT DISTINCT f1."receiving_user_id" AS common_friend_id
                 FROM "friends" f1
@@ -116,7 +122,12 @@ public class UserDbStorage implements UserStorage {
                 WHERE f1."requested_user_id" = ?
                 AND f2."requested_user_id" = ?;
                 """;
-        return jdbcTemplate.queryForList(sql, new Object[]{userId1, userId2}, Integer.class);
+        List<Integer> friendId = jdbcTemplate.queryForList(sql, Integer.class, userId1, userId2);
+        List<User> friends = new ArrayList<>();
+        for (Integer i : friendId) {
+            friends.add(getUserById(i));
+        }
+        return friends;
     }
 
     private static class UserRowMapper implements RowMapper<User> {

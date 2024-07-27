@@ -10,10 +10,8 @@ import ru.yandex.practicum.filmorate.storage.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 public class UserService extends ru.yandex.practicum.filmorate.service.Service {
@@ -37,8 +35,8 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
     public User updateUser(User user) {
         if (userStorage.getUsers().containsKey(user.getId())) {
             if (validateUser(user)) {
-                userStorage.updateUser(user, user.getId());
-                return user;
+                User user1 = userStorage.updateUser(user, user.getId());
+                return user1;
             } else {
                 throw new ValidationException("Wrong user info");
             }
@@ -70,7 +68,9 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
     }
 
     public void removeFriend(int firstId, int secondId) {
-        Map<Integer, User> users = userStorage.getUsers();
+        ((UserDbStorage) userStorage).removeFriend(firstId, secondId);
+
+        /*Map<Integer, User> users = userStorage.getUsers();
         if (users.containsKey(firstId)) {
             if (users.containsKey(secondId)) {
                 User user1 = users.get(firstId);
@@ -86,7 +86,7 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
             }
         } else {
             throw new NotFoundException("User doesn't exist", firstId);
-        }
+        }*/
     }
 
     public List<User> getFriends(int id) {
@@ -105,7 +105,8 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
     }
 
     public List<User> getCommonFriends(int firstId, int secondId) {
-        Map<Integer, User> users = userStorage.getUsers();
+        return ((UserDbStorage) userStorage).getCommonFriends(firstId, secondId);
+        /*Map<Integer, User> users = userStorage.getUsers();
         if (users.containsKey(firstId)) {
             if (users.containsKey(secondId)) {
                 User user1 = users.get(firstId);
@@ -123,7 +124,7 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
             }
         } else {
             throw new NotFoundException("User doesn't exist", firstId);
-        }
+        }*/
     }
 
     public User getUserById(int id) {
