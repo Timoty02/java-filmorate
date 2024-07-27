@@ -35,8 +35,8 @@ public class UserDbStorage implements UserStorage {
             Set<Integer> friends = jdbcTemplate.query(sql1, new Object[]{id, id},
                             (resultSet, i) -> new User(resultSet.getInt("receiving_user_id"),
                                     resultSet.getString("email"), resultSet.getString("login"),
-                                    resultSet.getString("name"), resultSet.getDate("birthday"))).
-                    stream().map(User::getId).collect(Collectors.toSet());
+                                    resultSet.getString("name"), resultSet.getDate("birthday")))
+                            .stream().map(User::getId).collect(Collectors.toSet());
             user.setFriends(friends);
             return user;
         } else {
