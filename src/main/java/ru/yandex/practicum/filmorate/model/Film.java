@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -12,16 +13,17 @@ import java.util.TreeSet;
 
 @Data
 @AllArgsConstructor
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class Film {
-    protected int id;
-    protected String name;
-    protected String description;
-    protected Mpa mpa;
-    protected Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
-    protected LocalDate releaseDate;
-    protected int duration;
-    protected Set<Integer> likes = new HashSet<>();
+    int id;
+    String name;
+    String description;
+    Mpa mpa;
+    Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
+    LocalDate releaseDate;
+    int duration;
+    Set<Integer> likes = new HashSet<>();
 
     public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
         this.id = id;

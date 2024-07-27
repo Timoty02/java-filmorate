@@ -39,7 +39,7 @@ public class FilmService extends ru.yandex.practicum.filmorate.service.Service {
         try {
             return filmStorage.updateFilm(film, film.getId());
         } catch (NotFoundException e) {
-            throw new NotFoundException("film does not exist");
+            throw new NotFoundException("film " + film.getId() + " does not exist");
         }
 
     }
