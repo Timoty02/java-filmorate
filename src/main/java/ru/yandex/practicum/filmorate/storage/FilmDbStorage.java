@@ -62,13 +62,13 @@ public class FilmDbStorage implements FilmStorage {
             jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
                     film.getMpa().getId());
             String sql2 = "SELECT \"id\" FROM \"films\" ORDER BY \"id\" DESC limit 1";
-            Integer film_id = jdbcTemplate.queryForObject(sql2, Integer.class);
+            Integer filmId = jdbcTemplate.queryForObject(sql2, Integer.class);
             for (Genre genre : film.getGenres()) {
                 int genreId = genre.getId();
                 String sql3 = "INSERT INTO \"film_genres\" (\"film_id\", \"genre_id\") VALUES (?, ?)";
-                jdbcTemplate.update(sql3, film_id, genreId);
+                jdbcTemplate.update(sql3, filmId, genreId);
             }
-            return getFilmById(film_id);
+            return getFilmById(filmId);
         } catch (DataAccessException e) {
             throw new ValidationException(e.getMessage());
         }
