@@ -93,7 +93,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable int id) {
+    public List<Integer> getFriends(@PathVariable int id) {
         try {
             return userService.getFriends(id);
         } catch (NotFoundException e) {

@@ -78,16 +78,16 @@ public class UserDbStorage implements UserStorage {
 
     }
 
-    public List<User> getFriends(int userId) {
+    public List<Integer> getFriends(int userId) {
         try {
             String sql = "SELECT \"receiving_user_id\" FROM \"friends\" WHERE \"requested_user_id\" = ?";
             List<Integer> friendsIds = jdbcTemplate.queryForList(sql, new Object[]{userId}, Integer.class);
-            List<User> friends = new ArrayList<>();
+            /*List<User> friends = new ArrayList<>();
             for (Integer friendId : friendsIds) {
                 User user = getUserById(friendId);
                 friends.add(user);
-            }
-            return friends;
+            }*/
+            return friendsIds;
         } catch (DataAccessException e) {
             throw new NotFoundException("User not found");
         }

@@ -89,7 +89,7 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
         }
     }
 
-    public List<User> getFriends(int id) {
+    public List<Integer> getFriends(int id) {
         return ((UserDbStorage) userStorage).getFriends(id);
         /*if (userStorage.getUsers().containsKey(id)) {
             Set<Integer> friendsIds = userStorage.getUserById(id).getFriends();
