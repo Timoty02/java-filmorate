@@ -65,11 +65,10 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
         try {
-            User user = userService.addFriend(id, friendId);
+            userService.addFriend(id, friendId);
             log.info("Friend added");
-            return user;
         } catch (NotFoundException e) {
             log.warn("Unable to add friend user - " + e.getId() + " does not exist");
             throw new NotFoundException(e.getMessage());
@@ -94,7 +93,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable int id) {
+    public List<Integer> getFriends(@PathVariable int id) {
         try {
             return userService.getFriends(id);
         } catch (NotFoundException e) {

@@ -22,13 +22,14 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
         try {
-            filmService.addFilm(film);
+            Film film1 = filmService.addFilm(film);
+            log.info("Added new film - " + film1);
+            return film1;
         } catch (ValidationException e) {
             log.warn("Unable to add film - " + film + " due to validation error");
             throw new ValidationException("Wrong film info");
         }
-        log.info("Added new film - " + film);
-        return film;
+
     }
 
     @GetMapping

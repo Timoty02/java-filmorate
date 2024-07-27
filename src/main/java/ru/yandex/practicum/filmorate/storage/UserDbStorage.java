@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
@@ -36,7 +38,7 @@ public class UserDbStorage implements UserStorage {
                             (resultSet, i) -> new User(resultSet.getInt("receiving_user_id"),
                                     resultSet.getString("email"), resultSet.getString("login"),
                                     resultSet.getString("name"), resultSet.getDate("birthday")))
-                            .stream().map(User::getId).collect(Collectors.toSet());
+                    .stream().map(User::getId).collect(Collectors.toSet());
             user.setFriends(friends);
             return user;
         } else {
@@ -70,13 +72,32 @@ public class UserDbStorage implements UserStorage {
     }
 
     public void addFriend(int requestedUserId, int receivingUserId) {
-        String sql = "INSERT INTO \"friends\" (\"requested_user_id\", \"receiving_user_id\") VALUES (?, ?)";
-        jdbcTemplate.update(sql, requestedUserId, receivingUserId);
+        try {
+            String sql = "INSERT INTO \"friends\" (\"requested_user_id\", \"receiving_user_id\") VALUES (?, ?)";
+            jdbcTemplate.update(sql, requestedUserId, receivingUserId);
+        } catch (DataAccessException e) {
+            throw new NotFoundException("User not found");
+        }
+
+    }
+
+    public List<Integer> getFriends(int userId) {
+        try {
+            String sql = "SELECT \"receiving_user_id\" FROM \"friends\" WHERE \"requested_user_id\" = ?";
+            return jdbcTemplate.queryForList(sql, new Object[]{userId}, Integer.class);
+        } catch (DataAccessException e) {
+            throw new NotFoundException("User not found");
+        }
     }
 
     public void removeFriend(int requestedUserId, int receivingUserId) {
-        String sql = "DELETE FROM \"friends\" WHERE \"requested_user_id\" = ? AND \"receiving_user_id\" = ?";
-        jdbcTemplate.update(sql, requestedUserId, receivingUserId);
+        try {
+            String sql = "DELETE FROM \"friends\" WHERE \"requested_user_id\" = ? AND \"receiving_user_id\" = ?";
+            jdbcTemplate.update(sql, requestedUserId, receivingUserId);
+        } catch (DataAccessException e) {
+            throw new NotFoundException("User not found");
+        }
+
     }
 
     public List<Integer> getCommonFriends(int userId1, int userId2) {

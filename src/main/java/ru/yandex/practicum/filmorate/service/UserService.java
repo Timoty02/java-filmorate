@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
@@ -46,8 +47,9 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
         }
     }
 
-    public User addFriend(int firstId, int secondId) {
-        Map<Integer, User> users = userStorage.getUsers();
+    public void addFriend(int firstId, int secondId) {
+        ((UserDbStorage) userStorage).addFriend(firstId, secondId);
+        /*Map<Integer, User> users = userStorage.getUsers();
         if (users.containsKey(firstId)) {
             if (users.containsKey(secondId)) {
                 User user1 = users.get(firstId);
@@ -64,7 +66,7 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
             }
         } else {
             throw new NotFoundException("User doesn't exist", firstId);
-        }
+        }*/
     }
 
     public void removeFriend(int firstId, int secondId) {
@@ -87,8 +89,9 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
         }
     }
 
-    public List<User> getFriends(int id) {
-        if (userStorage.getUsers().containsKey(id)) {
+    public List<Integer> getFriends(int id) {
+        return ((UserDbStorage) userStorage).getFriends(id);
+        /*if (userStorage.getUsers().containsKey(id)) {
             Set<Integer> friendsIds = userStorage.getUserById(id).getFriends();
             List<User> friends = new ArrayList<>();
             for (int i :
@@ -98,7 +101,7 @@ public class UserService extends ru.yandex.practicum.filmorate.service.Service {
             return friends;
         } else {
             throw new NotFoundException("User doesn't exist", id);
-        }
+        }*/
     }
 
     public List<User> getCommonFriends(int firstId, int secondId) {
