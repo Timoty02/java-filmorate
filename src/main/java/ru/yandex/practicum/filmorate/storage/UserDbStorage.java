@@ -28,10 +28,10 @@ public class UserDbStorage implements UserStorage {
 
     public User getUserById(int id) {
         String sql = "SELECT * FROM \"users\" WHERE \"id\" = ?";
-        User user = jdbcTemplate.queryForObject(sql, new Object[]{id}, (resultSet, i) -> new User(resultSet.getInt("id"), resultSet.getString("email"), resultSet.getString("login"), resultSet.getString("name"), resultSet.getDate("birthday")));
+        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), new Object[]{id});   //, new Object[]{id}, (resultSet, i) -> new User(resultSet.getInt("id"), resultSet.getString("email"), resultSet.getString("login"), resultSet.getString("name"), resultSet.getDate("birthday")));
         if (user != null) {
             String sql1 = "SELECT * FROM \"friends\" f JOIN \"users\" u ON f.\"receiving_user_id\" = u.\"id\" WHERE \"requested_user_id\" = ?";
-            Set<Integer> friends = jdbcTemplate.query(sql1, new Object[]{id, id},
+            Set<Integer> friends = jdbcTemplate.query(sql1, new Object[]{id},
                             (resultSet, i) -> new User(resultSet.getInt("receiving_user_id"),
                                     resultSet.getString("email"), resultSet.getString("login"),
                                     resultSet.getString("name"), resultSet.getDate("birthday")))
@@ -78,16 +78,21 @@ public class UserDbStorage implements UserStorage {
 
     }
 
-    public List<Integer> getFriends(int userId) {
+    public List<User> getFriends(int userId) {
+        try {
+            getUserById(userId);
+        } catch (DataAccessException e) {
+            throw new NotFoundException("User not found");
+        }
         try {
             String sql = "SELECT \"receiving_user_id\" FROM \"friends\" WHERE \"requested_user_id\" = ?";
             List<Integer> friendsIds = jdbcTemplate.queryForList(sql, new Object[]{userId}, Integer.class);
-            /*List<User> friends = new ArrayList<>();
+            List<User> friends = new ArrayList<>();
             for (Integer friendId : friendsIds) {
                 User user = getUserById(friendId);
                 friends.add(user);
-            }*/
-            return friendsIds;
+            }
+            return friends;
         } catch (DataAccessException e) {
             throw new NotFoundException("User not found");
         }
