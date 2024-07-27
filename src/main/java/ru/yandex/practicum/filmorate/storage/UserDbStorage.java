@@ -12,10 +12,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -81,10 +78,16 @@ public class UserDbStorage implements UserStorage {
 
     }
 
-    public List<Integer> getFriends(int userId) {
+    public List<User> getFriends(int userId) {
         try {
             String sql = "SELECT \"receiving_user_id\" FROM \"friends\" WHERE \"requested_user_id\" = ?";
-            return jdbcTemplate.queryForList(sql, new Object[]{userId}, Integer.class);
+            List<Integer> friendsIds = jdbcTemplate.queryForList(sql, new Object[]{userId}, Integer.class);
+            List<User> friends = new ArrayList<>();
+            for (Integer friendId : friendsIds) {
+                User user = getUserById(friendId);
+                friends.add(user);
+            }
+            return friends;
         } catch (DataAccessException e) {
             throw new NotFoundException("User not found");
         }

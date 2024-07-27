@@ -93,12 +93,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public List<Integer> getFriends(@PathVariable int id) {
+    public List<User> getFriends(@PathVariable int id) {
         try {
             return userService.getFriends(id);
         } catch (NotFoundException e) {
-            log.warn("Unable to get friends user - " + e.getId() + " does not exist");
-            throw new NotFoundException(e.getMessage(), e.getId());
+            log.warn("Unable to get friends user - does not exist");
+            throw new NotFoundException(e.getMessage());
         }
     }
 
