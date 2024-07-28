@@ -20,13 +20,14 @@ public class UserController {
     @PostMapping
     public User addUser(@RequestBody User user) {
         try {
-            userService.addUser(user);
+            User addedUser = userService.addUser(user);
+            log.info("Added new user - " + user);
+            return addedUser;
         } catch (ValidationException e) {
             log.warn("Unable to add user - " + user + " due to validation error");
             throw new ValidationException("Wrong user info");
         }
-        log.info("Added new user - " + user);
-        return user;
+
     }
 
     @GetMapping
@@ -64,11 +65,10 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
         try {
-            User user = userService.addFriend(id, friendId);
+            userService.addFriend(id, friendId);
             log.info("Friend added");
-            return user;
         } catch (NotFoundException e) {
             log.warn("Unable to add friend user - " + e.getId() + " does not exist");
             throw new NotFoundException(e.getMessage());
@@ -97,8 +97,8 @@ public class UserController {
         try {
             return userService.getFriends(id);
         } catch (NotFoundException e) {
-            log.warn("Unable to get friends user - " + e.getId() + " does not exist");
-            throw new NotFoundException(e.getMessage(), e.getId());
+            log.warn("Unable to get friends user - does not exist");
+            throw new NotFoundException(e.getMessage());
         }
     }
 

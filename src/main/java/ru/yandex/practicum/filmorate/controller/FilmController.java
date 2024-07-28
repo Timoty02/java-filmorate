@@ -22,19 +22,20 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
         try {
-            filmService.addFilm(film);
+            Film film1 = filmService.addFilm(film);
+            log.info("Added new film - " + film1);
+            return film1;
         } catch (ValidationException e) {
             log.warn("Unable to add film - " + film + " due to validation error");
             throw new ValidationException("Wrong film info");
         }
-        log.info("Added new film - " + film);
-        return film;
+
     }
 
     @GetMapping
     public List<Film> getFilms() {
         log.info("List of films sent");
-        return filmService.getFilms().values().stream().toList();
+        return filmService.getFilms();
     }
 
     @GetMapping("/{id}")
@@ -65,11 +66,11 @@ public class FilmController {
     }
 
     @PutMapping(pathLike)
-    public Film addLike(@PathVariable int id, @PathVariable("user-id") int userId) {
+    public void addLike(@PathVariable int id, @PathVariable("user-id") int userId) {
         try {
-            Film film = filmService.addLike(id, userId);
+            filmService.addLike(id, userId);
             log.info("User " + userId + " liked film " + id);
-            return film;
+
         } catch (ValidationException e) {
             log.warn("User " + userId + " already liked that film");
             throw new ValidationException("User already liked that film");
